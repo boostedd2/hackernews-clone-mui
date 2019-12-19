@@ -1,4 +1,4 @@
-export const dummy = {
+const dummy = {
     "hits": [
       {
         "created_at": "2019-12-18T13:19:58.000Z",
@@ -791,4 +791,7 @@ export const dummy = {
     "query": "",
     "params": "advancedSyntax=true&analytics=true&analyticsTags=backend&tags=front_page",
     "processingTimeMS": 1
-  }
+   }
+ 
+
+  export default dummy

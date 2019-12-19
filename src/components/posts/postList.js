@@ -1,22 +1,38 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import dummy from './dummy'
+
+const plist = dummy
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: "80%",
     margin: "auto",
+    height: "100%",
+    backgroundColor: "#f6f6ef",
+    padding: "10px",
+  },
+  post_cont: {
+    display: "flex",
+    flexDirection: "column",
   },
   title_cont: {
     display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
   },
   post_title: {
     color: "black"
   },
   post_link: {
     marginLeft: "5px",
-    alignContent: "center",
     fontSize: "12px",
     color: "grey",
+  },
+  stats_cont: {
+    display: "flex",
+    color: "grey",
+    fontSize: "12px",
+    marginBottom: "10px",
   }
 }));
 
@@ -25,17 +41,22 @@ const PostList = () => {
 
   return(
     <div className={classes.root}>
-      <div className={classes.title_cont}>
-        <div className={classes.post_title}>Title</div>
-        <div className={classes.post_link}>(Link)</div>
-      </div>
-      <div>
-        <div>points</div>
-        <div>by User</div>
-        <div>2 hours ago</div>
-        <div>| hide |</div>
-        <div>12 comments</div>
-      </div>
+      {plist.hits.map((item, index) =>
+        <>
+          <div style={{color: "grey", float: "left"}}>{index + 1}.</div>
+          <div className={classes.post_cont}>
+            <div className={classes.title_cont}>
+              <div className={classes.post_title}>{item.title}</div>
+              <div className={classes.post_link}>(Link)</div>
+            </div>
+            <div className={classes.stats_cont}>
+              <div>{`${item.points} by ${item.author} 2 hours ago`}</div>
+              <div>| hide |</div>
+              <div>{item.num_comments} comments</div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
