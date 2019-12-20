@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import dummy from './dummy'
 
@@ -21,7 +21,11 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
   },
   post_title: {
-    color: "black"
+    color: "black",
+    '& a': {
+      color: "black",
+      textDecoration: "none",
+    }
   },
   post_link: {
     marginLeft: "5px",
@@ -30,29 +34,60 @@ const useStyles = makeStyles(theme => ({
   },
   stats_cont: {
     display: "flex",
+    flexWrap: "wrap",
     color: "grey",
     fontSize: "12px",
     marginBottom: "10px",
-  }
+  },
 }));
 
 const PostList = () => {
   const classes = useStyles();
+  const [displayPosts, setDisplayPosts] = useState(dummy)
+
+  function url_domain(data) {
+    var a = document.createElement('a');
+    if (data === null) {
+      return ''
+    }
+    a.href = data;
+    return '(' + a.hostname.replace(/^www\./,'') + ')';
+  }
+
+  function localUrl(data, id) {
+    if (data === null) {
+      return 'https://news.ycombinator.com/item?id=' + id
+    }
+    return data
+  }
+
+  function timeconvert(time) {
+    var postDate = new Date(time)
+    var currDate = new Date()
+    var diff = currDate - postDate
+    if (diff > 60e3) { 
+      console.log(Math.floor(diff / 3600e3), 'hours ago');
+      return Math.floor(diff / 3600e3), 'hours ago'
+    }
+    else console.log(
+      Math.floor(diff / 60e3), 'minutes ago');
+      return Math.floor(diff / 60e3), 'minutes ago'
+  }
 
   return(
     <div className={classes.root}>
-      {plist.hits.map((item, index) =>
+      {displayPosts.hits.map((item, index) =>
         <>
           <div style={{color: "grey", float: "left"}}>{index + 1}.</div>
           <div className={classes.post_cont}>
             <div className={classes.title_cont}>
-              <div className={classes.post_title}>{item.title}</div>
-              <div className={classes.post_link}>(Link)</div>
+              <div className={classes.post_title}><a href={localUrl(item.url, item.objectID)}>{item.title}</a></div>
+              <div className={classes.post_link}>{url_domain(item.url)}</div>
             </div>
             <div className={classes.stats_cont}>
-              <div>{`${item.points} by ${item.author} 2 hours ago`}</div>
-              <div>| hide |</div>
-              <div>{item.num_comments} comments</div>
+              <div>{`${item.points} points by ${item.author} ${timeconvert(item.created_at)} ago`} |</div>
+              <div className={classes.hide_button}>&nbsp;hide&nbsp;</div>
+              <div>| {item.num_comments} comments</div>
             </div>
           </div>
         </>
