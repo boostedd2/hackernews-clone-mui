@@ -17,8 +17,8 @@ const NavBar = () => {
       <AppBar position="static" style={{backgroundColor: "#ff742b", marginBottom: "10px",}}>
         <Toolbar disableGutters>
           <img src="//d3nb9u6x572n0.cloudfront.net/packs/media/images/logo-hn-search-a822432b.png" width="48px" />
-          <h3 style={{color: "black"}}>Hacker News</h3>
-          <h5 style={{marginLeft: "auto", paddingRight: "10px", color: "black"}}>login</h5>
+          <h3 style={{color: "black"}}>cp Hacker News .</h3>
+          <h5 style={{marginLeft: "auto", paddingRight: "10px", color: "black"}}></h5>
         </Toolbar>
       </AppBar>
     </div>
