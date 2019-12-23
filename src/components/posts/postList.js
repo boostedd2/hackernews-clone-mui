@@ -60,7 +60,8 @@ const useStyles = makeStyles(theme => ({
 const PostList = () => {
   const classes = useStyles();
   const [displayPosts, setDisplayPosts] = useState('')
-  const [cachedPosts, setCachedPosts] = useState([])
+  const [searchTerm, setSearchTerm] = useState('Home')
+  const [extraPosts, setExtraPosts] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   
   useEffect(async () => {
@@ -69,8 +70,6 @@ const PostList = () => {
         'http://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30'
       );
         setDisplayPosts(result.data)
-        cachedPosts.push(result.data)
-        console.log(cachedPosts)
         setIsLoading(false)
     };
     fetchData();
@@ -97,12 +96,23 @@ const PostList = () => {
     var currDate = new Date()
     var diff = currDate - postDate
     if (diff > 3600e3) {
-      if (diff / 3600e3 > 24) {
+      if (diff / 3600e3 > 24 >= 1) {
         return Math.floor(diff / 3600e3) % 24 + ' days ago'
       }
       return (Math.floor(diff / 3600e3) + ' hours ago')
     }
     else return (Math.floor(diff / 60e3) + ' minutes ago')
+  }
+
+  function loadMore() {
+    axios.get(
+      `http://hn.algolia.com/api/v1/search?query=''&page=${extraPosts.toString()}&hitsPerPage=30`
+    )
+    .then(result => {
+      setExtraPosts(extraPosts + 1)
+      setDisplayPosts(result.data)
+      setIsLoading(false)
+      })
   }
 
   return(
@@ -113,7 +123,7 @@ const PostList = () => {
           <div style={{color: "grey", float: "left"}}>{index + 1}.</div>
           <div className={classes.post_cont}>
             <div className={classes.title_cont}>
-              <div className={classes.post_title}><a href={localUrl(item.url, item.objectID)}>{item.title}</a></div>
+              <div className={classes.post_title}><a href={localUrl(item.url, item.objectID)} target="_blank">{item.title}</a></div>
               <div className={classes.post_link}>{url_domain(item.url)}</div>
             </div>
             <div className={classes.stats_cont}>
@@ -121,11 +131,16 @@ const PostList = () => {
               <div>&nbsp;|&nbsp;</div>
               <div className={classes.hide_button}><a href="#">hide</a></div>
               <div>&nbsp;|&nbsp;</div>
-              <div className={classes.comments}><a href={'https://news.ycombinator.com/item?id=' + item.objectID}>{item.num_comments} comments</a></div>
+              <div className={classes.comments}><a href={'https://news.ycombinator.com/item?id=' + item.objectID} target="_blank">{item.num_comments} comments</a></div>
             </div>
           </div>
         </>
       )}
+      <button onClick={() => loadMore()}>More</button>
+      <input type="text"></input>
+      <button>Search</button>
+      <div>Page: {extraPosts.toString()}</div>
+      <div>Results of: {searchTerm}</div>
     </div>
   )
 }
