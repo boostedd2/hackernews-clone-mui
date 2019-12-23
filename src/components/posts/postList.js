@@ -136,7 +136,7 @@ const PostList = () => {
 
   function onSearch(searchTerm) {
     axios.get(
-      `http://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
+      `https://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
     )
     .then(result => {
       setDisplayPosts(result.data.hits)
