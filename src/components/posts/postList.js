@@ -37,13 +37,32 @@ const useStyles = makeStyles(theme => ({
     fontSize: "12px",
     marginBottom: "10px",
   },
-  hide_button: {
+  user: {
     '& a': {
       color: "grey",
       textDecoration: "none",
     },
     '& a:hover': {
       textDecoration: "underline"
+    }
+  },
+  time: {
+    '& a': {
+      color: "grey",
+      textDecoration: "none",
+    },
+    '& a:hover': {
+      textDecoration: "underline"
+    }
+  },
+  hide_button: {
+    '& a': {
+      color: "grey",
+      textDecoration: "none",
+    },
+    '& a:hover': {
+      textDecoration: "underline",
+      cursor: "pointer"
     }
   },
   comments: {
@@ -60,7 +79,7 @@ const useStyles = makeStyles(theme => ({
 const PostList = () => {
   const classes = useStyles();
   const [displayPosts, setDisplayPosts] = useState('')
-  const [searchTerm, setSearchTerm] = useState('Home')
+  const [searchTerm, setSearchTerm] = useState('')
   const [extraPosts, setExtraPosts] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   
@@ -69,7 +88,7 @@ const PostList = () => {
       const result = await axios(
         'http://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30'
       );
-        setDisplayPosts(result.data)
+        setDisplayPosts(result.data.hits)
         setIsLoading(false)
     };
     fetchData();
@@ -106,39 +125,59 @@ const PostList = () => {
 
   function loadMore() {
     axios.get(
-      `http://hn.algolia.com/api/v1/search?query=''&page=${extraPosts.toString()}&hitsPerPage=30`
+      `http://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
     )
     .then(result => {
       setExtraPosts(extraPosts + 1)
-      setDisplayPosts(result.data)
+      setDisplayPosts(result.data.hits)
       setIsLoading(false)
       })
+  }
+
+  function onSearch(searchTerm) {
+    axios.get(
+      `http://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
+    )
+    .then(result => {
+      setDisplayPosts(result.data.hits)
+      setIsLoading(false)
+      })
+  }
+
+  function onDismiss(id) {
+    const isNotId = item => item.objectID !== id;
+    const updatedList = displayPosts.filter(isNotId);
+    console.log(updatedList)
+    setDisplayPosts(updatedList)
   }
 
   return(
     <div className={classes.root}>
       {isLoading ? <Loading /> :
-      displayPosts.hits.map((item, index) =>
-        <>
+      displayPosts.map((item, index) =>
+        <div key={index}>
           <div style={{color: "grey", float: "left"}}>{index + 1}.</div>
           <div className={classes.post_cont}>
             <div className={classes.title_cont}>
-              <div className={classes.post_title}><a href={localUrl(item.url, item.objectID)} target="_blank">{item.title}</a></div>
+              <div className={classes.post_title}><a href={localUrl(item.url, item.objectID)} target="_blank" rel="noopener noreferrer">{item.title}</a></div>
               <div className={classes.post_link}>{url_domain(item.url)}</div>
             </div>
             <div className={classes.stats_cont}>
-              <div>{`${item.points} points by ${item.author} ${timeconvert(item.created_at)}`}</div>
+              <div>{`${item.points} points by`}&nbsp;</div>
+              <div className={classes.user}><a href={'https://news.ycombinator.com/user?id='+ item.author} target="_blank" rel="noopener noreferrer">{item.author}</a></div>
+              <div>&nbsp;</div>
+              <div className={classes.time}><a href={'https://news.ycombinator.com/item?id=' + item.objectID} target="_blank" rel="noopener noreferrer">{timeconvert(item.created_at)}</a></div>
               <div>&nbsp;|&nbsp;</div>
-              <div className={classes.hide_button}><a href="#">hide</a></div>
+              <div className={classes.hide_button}><a onClick={() => onDismiss(item.objectID)}>hide</a></div>
               <div>&nbsp;|&nbsp;</div>
-              <div className={classes.comments}><a href={'https://news.ycombinator.com/item?id=' + item.objectID} target="_blank">{item.num_comments} comments</a></div>
+              <div className={classes.comments}><a href={'https://news.ycombinator.com/item?id=' + item.objectID} target="_blank" rel="noopener noreferrer">{item.num_comments} comments</a></div>
             </div>
           </div>
-        </>
+        </div>
       )}
       <button onClick={() => loadMore()}>More</button>
-      <input type="text"></input>
-      <button>Search</button>
+      <input type="text" onChange={e => setSearchTerm(e.target.value)}></input>
+      <button onClick={() => onSearch(searchTerm)}>Search</button>
       <div>Page: {extraPosts.toString()}</div>
       <div>Results of: {searchTerm}</div>
     </div>
