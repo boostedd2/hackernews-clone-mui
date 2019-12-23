@@ -86,7 +86,7 @@ const PostList = () => {
   useEffect(async () => {
     const fetchData = async () => {
       const result = await axios(
-        'http://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30'
+        'https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30'
       );
         setDisplayPosts(result.data.hits)
         setIsLoading(false)
@@ -125,7 +125,7 @@ const PostList = () => {
 
   function loadMore() {
     axios.get(
-      `http://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
+      `https://hn.algolia.com/api/v1/search?query=${searchTerm}&page=${extraPosts.toString()}&hitsPerPage=30`
     )
     .then(result => {
       setExtraPosts(extraPosts + 1)
